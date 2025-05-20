@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BANG! - Solana Revolver Protocol</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap');
+        
+        :root {
+            --primary: #000000;
+            --primary-dark: #333333;
+            --danger: #E60000;
+            --success: #007F47;
+            --dark: #000000;
+            --darker: #111111;
+            --light: #FFFFFF;
+            --gray: #666666;
+            --accent: #444444;
+            --light-gray: #F5F5F5;
+            --border-color: #E0E0E0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 4rem;
+            font-weight: 700;
+            letter-spacing: -2px;
+            position: relative;
+            display: inline-block;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .logo::before {
+            content: "BANG!";
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            color: rgba(0, 0, 0, 0.1);
+            z-index: -1;
+            animation: flicker 4s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0%, 30%, 50%, 100% { opacity: 0.1; }
+            5%, 20%, 55%, 95% { opacity: 0.05; }
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            font-weight: 300;
+            color: var(--gray);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            padding-bottom: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .subtitle::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 1px;
+            background: var(--primary);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 40px;
+            width: 100%;
+            margin-bottom: 40px;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            opacity: 0.8;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-dark);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .stat-label::before {
+            content: "";
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            margin-right: 8px;
+            border-radius: 50%;
+        }
+
+        .stat-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .revolver-section {
+            background: var(--light);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .revolver-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        .revolver-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .revolver-title::before, .revolver-title::after {
+            content: "//";
+            color: var(--primary);
+            margin: 0 10px;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        .revolver-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            margin: 0 auto;
+            perspective: 1000px;
+            max-width: 400px;
+        }
+
+        .revolver {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transform-style: preserve-3d;
+            transition: transform 4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .cylinder {
+            position: relative;
+            width: 80%;
+            height: 80%;
+            margin: 10% auto;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #F5F5F5, #FFFFFF);
+            box-shadow: 
+                inset 0 0 20px rgba(0, 0, 0, 0.1),
+                0 0 30px rgba(0, 0, 0, 0.05);
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cylinder::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10%;
+            height: 10%;
+            border-radius: 50%;
+            background: var(--dark);
+            border: 1px solid rgba(0, 0, 0, 0.3);
+        }
+
+        .circuit-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+
+        .circuit-lines::before,
+        .circuit-lines::after {
+            content: '';
+            position: absolute;
+            background: var(--primary);
+        }
+
+        .circuit-lines::before {
+            top: 20%;
+            left: 10%;
+            width: 80%;
+            height: 1px;
+            transform: rotate(30deg);
+        }
+
+        .circuit-lines::after {
+            top: 40%;
+            left: 30%;
+            width: 40%;
+            height: 1px;
+            transform: rotate(-45deg);
+        }
+
+        .chamber {
+            position: absolute;
+            width: 15%;
+            aspect-ratio: 1;
+            background: var(--light-gray);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--gray);
+            transition: all 0.3s ease;
+            top: 50%;
+            left: 50%;
+            margin-left: -7.5%; /* Half of width */
+            margin-top: -7.5%; /* Half of height */
+        }
+
+        .chamber.loaded {
+            background: rgba(230, 0, 0, 0.1);
+            border-color: var(--danger);
+            box-shadow: 0 0 15px rgba(230, 0, 0, 0.2);
+        }
+
+        .chamber.loaded::after {
+            content: '';
+            position: absolute;
+            width: 40%;
+            height: 40%;
+            background: var(--danger);
+            border-radius: 50%;
+        }
+
+        .chamber.current {
+            transform: scale(1.15);
+            z-index: 10;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Update the transform properties to rotate around the center */
+        .chamber:nth-child(1) { transform: rotate(0deg) translateX(85%) rotate(0deg); }
+        .chamber:nth-child(2) { transform: rotate(60deg) translateX(85%) rotate(-60deg); }
+        .chamber:nth-child(3) { transform: rotate(120deg) translateX(85%) rotate(-120deg); }
+        .chamber:nth-child(4) { transform: rotate(180deg) translateX(85%) rotate(-180deg); }
+        .chamber:nth-child(5) { transform: rotate(240deg) translateX(85%) rotate(-240deg); }
+        .chamber:nth-child(6) { transform: rotate(300deg) translateX(85%) rotate(-300deg); }
+
+        .controls-section {
+            background: var(--light);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            width: 100%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .control-group {
+            position: relative;
+        }
+
+        .control-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            align-items: stretch;
+            flex-wrap: wrap;
+        }
+
+        input[type="number"] {
+            background: var(--light);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 14px 20px;
+            color: var(--dark);
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 200px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn {
+            background: var(--light);
+            color: var(--dark);
+            border: 1px solid var(--primary);
+            padding: 14px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0));
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .btn:hover::before {
+            transform: translateX(0);
+        }
+
+        .btn:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn:disabled {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: var(--border-color);
+            color: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn:disabled::before {
+            display: none;
+        }
+
+        .btn-icon {
+            margin-right: 8px;
+            font-size: 1.1em;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--light);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            border-color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-danger {
+            background: var(--light);
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: rgba(230, 0, 0, 0.05);
+        }
+
+        .btn-success {
+            background: var(--light);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .btn-success:hover {
+            background: rgba(0, 127, 71, 0.05);
+        }
+
+        .result {
+            margin-top: 30px;
+            font-size: 1rem;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 8px;
+            background: var(--light-gray);
+            border: 1px solid var(--border-color);
+            font-family: 'Space Mono', monospace;
+            position: relative;
+            overflow: hidden;
+            color: var(--dark);
+        }
+
+        .result::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--gray), transparent);
+        }
+
+        .result-logo {
+width: 380px;
+    height: auto;
+    margin-bottom: 10px;
+    margin-left: 100px;
+        }
+
+        .win {
+            color: var(--success);
+        }
+
+        .lose {
+            color: var(--danger);
+        }
+
+        .jackpot-win {
+            color: var(--primary);
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            from { text-shadow: 0 0 5px rgba(0, 0, 0, 0.2); }
+            to { text-shadow: 0 0 15px rgba(0, 0, 0, 0.4); }
+        }
+
+        .odds {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: var(--gray);
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+            background: var(--light-gray);
+            max-width: 450px;
+            margin: 15px auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 0.5px;
+        }
+
+        .odds-icon {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        .survivors-section {
+            margin-top: 40px;
+            width: 100%;
+            background: var(--light);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title-icon {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .survivor-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .survivor-item {
+            background: var(--light-gray);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            color: var(--dark);
+        }
+
+        .survivor-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .survivor-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--primary);
+            opacity: 0.8;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .terminal-footer {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--gray);
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            letter-spacing: 1px;
+        }
+
+        .terminal-footer span {
+            color: var(--primary);
+        }
+
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--success);
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Swap button styles */
+        .swap-btn-container {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+        }
+
+        .swap-btn {
+            background: var(--light);
+            border: 1px solid var(--primary);
+            color: var(--dark);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .swap-btn:hover {
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .swap-btn::after {
+            content: "Soon";
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--primary);
+            color: var(--light);
+            font-size: 0.6rem;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .logo { 
+                font-size: 3rem; 
+            }
+            
+            .revolver-container { 
+                max-width: 300px;
+            }
+            
+            .survivor-list {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+
+            .swap-btn-container {
+                position: static;
+                margin-top: 20px;
+                margin-bottom: -20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            input[type="number"] {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="swap-btn-container">
+            <button class="swap-btn" disabled>
+                <span class="btn-icon">⟁</span> Swap $BANG to Claim SOL
+            </button>
+        </div>
+
+        <div class="header">
+            <h1 class="logo">BANG!</h1>
+            <p class="subtitle">Solana Revolver Protocol - High Stakes Survival @</p>
+        </div>
+
+        <div class="grid-layout">
+            <div>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-label">Balance</div>
+                        <div class="stat-value" id="balance">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Jackpot</div>
+                        <div class="stat-value" id="jackpot">3.53 SOL</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Players</div>
+                        <div class="stat-value" id="survivorCount">3</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Win Rate</div>
+                        <div class="stat-value" id="survivalRate">0%</div>
+                    </div>
+                </div>
+
+                <div class="revolver-section">
+                    <div class="revolver-title">Revolver Chamber</div>
+                    <div class="revolver-container">
+                        <div class="revolver" id="revolver">
+                            <div class="cylinder">
+                                <div class="circuit-lines"></div>
+                                <div class="chamber" data-chamber="1">1</div>
+                                <div class="chamber" data-chamber="2">2</div>
+                                <div class="chamber" data-chamber="3">3</div>
+                                <div class="chamber" data-chamber="4">4</div>
+                                <div class="chamber" data-chamber="5">5</div>
+                                <div class="chamber" data-chamber="6">6</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="controls-section">
+                    <div class="controls">
+                        <div class="control-group">
+                            <div class="control-title">Token Management</div>
+                            <button class="btn btn-secondary" onclick="getTokens()" id="getTokensBtn">
+                                <span class="btn-icon">⚡</span> Claim Free Tokens
+                            </button>
+                        </div>
+                        
+                        <div class="control-group">
+                            <div class="control-title">Game Setup</div>
+                            <div class="input-group">
+                                <input type="number" id="betAmount" placeholder="Enter bet amount" min="1" max="10000">
+                                <button class="btn btn-primary" onclick="loadTokens()" id="loadBtn">
+                                    <span class="btn-icon">⟁</span> Initialize Chamber
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="control-group">
+                            <button class="btn btn-danger" onclick="spinAndShoot()" id="shootBtn" disabled>
+                                <span class="btn-icon">⚠</span> Execute Protocol
+                            </button>
+                        </div>
+                        
+                        <div class="odds">
+                            <span class="odds-icon">⟁</span> Protocol Success Rate: 83.33% (2x return) | Failure Rate: 16.67%
+                        </div>
+                    </div>
+
+                    <div class="result" id="result">
+
+                    </div>
+                </div>
+                                        <img src="image-removebg-preview.png" alt="BANG! Logo" class="result-logo">
+            </div>
+        </div>
+
+        <div class="survivors-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon">⟁</span> Protocol Champions
+                </div>
+                <div class="connection-status">
+                    <div class="connection-dot"></div>
+                    LIVE
+                </div>
+            </div>
+            <div class="survivor-list" id="survivorList">
+                <!-- Survivors will be populated here -->
+            </div>
+        </div>
+
+        <div class="terminal-footer">
+            <span>$</span> BANG!_Protocol v2.5 | <span>$</span> Solana Network: <span>CONNECTED</span> | <span>$</span> 
+            Last Updated: 20.05.2025
+        </div>
+    </div>
+
+    <script>
+        // Matrix background effect
+        function initMatrixEffect() {
+            const matrixBg = document.getElementById('matrixBg');
+            const numColumns = 40;
+            const characters = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモ';
+            
+            for (let i = 0; i < numColumns; i++) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                column.style.setProperty('--left', Math.random() * 100);
+                column.style.setProperty('--speed', 8 + Math.random() * 10);
+                
+                for (let j = 0; j < 50; j++) {
+                    const char = document.createElement('div');
+                    char.textContent = characters.charAt(Math.floor(Math.random() * characters.length));
+                    column.appendChild(char);
+                }
+                
+                matrixBg.appendChild(column);
+            }
+        }
+
+        // Game state
+        let gameState = {
+            balance: 0,
+            jackpot: 3.53,
+            currentBet: 0,
+            isSpinning: false,
+            totalGames: 0,
+            survivalCount: 0,
+            playerNumber: Math.floor(Math.random() * 9999) + 1000,
+            survivors: 3,
+            hasClaimedTokens: false
+        };
+
+        // Initialize game
+        function initGame() {
+            updateDisplay();
+            generateSurvivors();
+            startJackpotCounter();
+            initMatrixEffect();
+        }
+
+        // Update all display elements
+        function updateDisplay() {
+            document.getElementById('balance').textContent = gameState.balance.toLocaleString();
+            document.getElementById('jackpot').textContent = gameState.jackpot.toLocaleString();
+            document.getElementById('survivorCount').textContent = gameState.survivors.toLocaleString();
+            
+            const survivalRate = gameState.totalGames > 0 ? 
+                Math.round((gameState.survivalCount / gameState.totalGames) * 100) : 0;
+            document.getElementById('survivalRate').textContent = survivalRate + '%';
+        }
+
+        // Get free tokens (daily claim)
+        function getTokens() {
+            if (gameState.hasClaimedTokens) {
+                showResult('⚠️ TOKEN CLAIM DENIED: Daily limit reached', 'lose');
+                return;
+            }
+
+            const freeTokens = 1000;
+            gameState.balance += freeTokens;
+            gameState.hasClaimedTokens = true;
+            
+            document.getElementById('getTokensBtn').disabled = true;
+            document.getElementById('getTokensBtn').innerHTML = '<span class="btn-icon">✓</span> Tokens Claimed';
+            
+            showResult(`⚡ ALLOCATION COMPLETE: ${freeTokens} tokens transferred to your account`, 'win');
+            updateDisplay();
+        }
+
+        // Load tokens into revolver
+        function loadTokens() {
+            if (gameState.isSpinning) return;
+            
+            const betAmount = parseInt(document.getElementById('betAmount').value);
+            
+            if (isNaN(betAmount) || betAmount <= 0) {
+                showResult('⚠️ INVALID INPUT: Please enter a valid token amount', 'lose');
+                return;
+            }
+            
+            if (betAmount > gameState.balance) {
+                showResult('⚠️ INSUFFICIENT BALANCE: Token quantity exceeds available funds', 'lose');
+                return;
+            }
+            
+            if (betAmount > 10000) {
+                showResult('⚠️ LIMIT EXCEEDED: Maximum bet is 10,000 tokens', 'lose');
+                return;
+            }
+            
+            gameState.currentBet = betAmount;
+            
+            // Visual feedback - show loaded chamber
+            const chambers = document.querySelectorAll('.chamber');
+            chambers.forEach(chamber => chamber.classList.remove('loaded'));
+            
+            const randomChamber = Math.floor(Math.random() * 6);
+            chambers[randomChamber].classList.add('loaded');
+            
+            document.getElementById('shootBtn').disabled = false;
+            showResult(`⟁ CHAMBER INITIALIZED: ${betAmount} tokens loaded. Protocol ready.`, '');
+        }
+
+        // Main game function
+        function spinAndShoot() {
+            if (gameState.isSpinning || gameState.currentBet <= 0) return;
+            
+            gameState.isSpinning = true;
+            document.getElementById('shootBtn').disabled = true;
+            document.getElementById('loadBtn').disabled = true;
+            
+            // Spin animation
+            const revolver = document.getElementById('revolver');
+            const chambers = document.querySelectorAll('.chamber');
+            
+            // Random spin rotations
+            const spins = 3 + Math.random() * 4;
+            const finalRotation = spins * 360;
+            revolver.style.transform = `translate(-50%, -50%) rotate(${finalRotation}deg)`;
+            
+            // Show spinning result
+            showResult('⟁ EXECUTING PROTOCOL <span class="loading"></span>', '');
+            
+            // Determine outcome (5/6 chance to win)
+            const isWin = Math.random() < (5/6);
+            
+            setTimeout(() => {
+                // Highlight current chamber
+                chambers.forEach(c => c.classList.remove('current'));
+                const currentChamber = Math.floor(Math.random() * 6);
+                chambers[currentChamber].classList.add('current');
+                
+                setTimeout(() => {
+                    processGameResult(isWin);
+                }, 1000);
+            }, 3000);
+        }
+
+        // Process game result
+        function processGameResult(isWin) {
+            gameState.totalGames++;
+            
+            if (isWin) {
+                // Win: 2x multiplier
+                const winAmount = gameState.currentBet * 2;
+                gameState.balance += winAmount;
+                gameState.survivalCount++;
+                gameState.survivors++;
+                
+                showResult(`✓ PROTOCOL SUCCESS: ${winAmount.toLocaleString()} tokens secured`, 'win');
+                addSurvivor(gameState.playerNumber, winAmount);
+                
+                // Check for jackpot eligibility
+                if (gameState.totalGames >= 10 && gameState.survivalCount === gameState.totalGames) {
+                    triggerJackpot();
+                }
+                
+            } else {
+                // Lose: Lose bet amount
+                gameState.balance -= gameState.currentBet;
+                gameState.jackpot += Math.floor(gameState.currentBet * 0.8); // 80% to jackpot
+                
+                showResult(`⚠️ CRITICAL FAILURE: ${gameState.currentBet.toLocaleString()} tokens lost`, 'lose');
+                
+                // Game over check
+                if (gameState.balance <= 0) {
+                    setTimeout(() => {
+                        showResult('⚠️ ACCOUNT DEPLETED: Claim tokens to continue', 'lose');
+                        resetTokenClaim();
+                    }, 2000);
+                }
+            }
+            
+            // Reset game state
+            gameState.currentBet = 0;
+            gameState.isSpinning = false;
+            document.getElementById('loadBtn').disabled = false;
+            document.getElementById('shootBtn').disabled = true;
+            
+            // Clear chamber highlights
+            setTimeout(() => {
+                document.querySelectorAll('.chamber').forEach(chamber => {
+                    chamber.classList.remove('loaded', 'current');
+                });
+            }, 3000);
+            
+            updateDisplay();
+        }
+
+        // Show result message
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = message;
+            resultDiv.className = 'result ' + type;
+        }
+
+        // Add survivor to list
+        function addSurvivor(playerNum, amount) {
+            const survivorList = document.getElementById('survivorList');
+            const newSurvivor = document.createElement('div');
+            newSurvivor.className = 'survivor-item';
+            newSurvivor.textContent = `P#${playerNum} secured ${amount.toLocaleString()} tokens`;
+            
+            survivorList.insertBefore(newSurvivor, survivorList.firstChild);
+            
+            // Keep only last 8 survivors
+            while (survivorList.children.length > 8) {
+                survivorList.removeChild(survivorList.lastChild);
+            }
+        }
+
+        // Trigger jackpot win
+        function triggerJackpot() {
+            const jackpotAmount = gameState.jackpot;
+            gameState.balance += jackpotAmount;
+            gameState.jackpot = 5000; // Reset jackpot
+            
+            showResult(`⚡ JACKPOT PROTOCOL ACTIVATED: ${jackpotAmount.toLocaleString()} tokens secured`, 'jackpot-win');
+            
+            // Reset survival streak
+            gameState.totalGames = 0;
+            gameState.survivalCount = 0;
+        }
+
+        // Generate random survivors
+        function generateSurvivors() {
+            const survivorList = document.getElementById('survivorList');
+            survivorList.innerHTML = '';
+            
+            for (let i = 0; i < 8; i++) {
+                const playerNum = Math.floor(Math.random() * 9999) + 1000;
+                const amount = Math.floor(Math.random() * 5000) + 1000;
+                addSurvivor(playerNum, amount);
+            }
+        }
+
+        // Start jackpot counter
+        function startJackpotCounter() {
+            setInterval(() => {
+                gameState.jackpot += Math.floor(Math.random() * 50) + 10;
+                gameState.survivors += Math.floor(Math.random() * 3);
+                updateDisplay();
+            }, 5000);
+        }
+
+        // Reset token claim (daily reset simulation)
+        function resetTokenClaim() {
+            setTimeout(() => {
+                gameState.hasClaimedTokens = false;
+                document.getElementById('getTokensBtn').disabled = false;
+                document.getElementById('getTokensBtn').innerHTML = '<span class="btn-icon">⚡</span> Claim Free Tokens';
+            }, 30000); // Reset after 30 seconds for demo
+        }
+
+        // Initialize game on load
+        window.addEventListener('load', initGame);
+
+        // Add some easter eggs and keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const shootBtn = document.getElementById('shootBtn');
+                if (!shootBtn.disabled) {
+                    spinAndShoot();
+                }
+            }
+        });
+
+        // Prevent form submission on enter
+        document.getElementById('betAmount').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                loadTokens();
+            }
+        });
+    </script>
+</body>
+</html>
